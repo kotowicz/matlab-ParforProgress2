@@ -47,9 +47,9 @@ classdef ParforProgress2 < handle
     end
     
     methods
-        function o = ParforProgress2(s, n, percentage, do_debug)
+        function o = ParforProgress2(s, n, percentage, do_debug, use_gui)
         % ParforProgress Build a Parfor Progress Monitor
-        % Use the syntax: ParforProgress( 'Window Title', N, percentage, do_debug )
+        % Use the syntax: ParforProgress( 'Window Title', N, percentage, do_debug, use_gui )
         % where N is the number of iterations in the PARFOR loop
         
             % initalize client
@@ -59,14 +59,18 @@ classdef ParforProgress2 < handle
                 o.Port      = [];
              
             % initialize server
-            elseif (nargin == 4 || nargin == 3 || nargin == 2)
-
-                if nargin < 3
-                    percentage = 0.1;
+            elseif (nargin == 5 || nargin == 4 || nargin == 3 || nargin == 2)
+                
+                if nargin < 5
+                    use_gui = 1;
                 end
                 
                 if nargin < 4
                     do_debug = 0;
+                end
+                
+                if nargin < 3
+                    percentage = 0.1;
                 end
                 
                 % check for old matlab versions.
@@ -74,7 +78,7 @@ classdef ParforProgress2 < handle
                     o.OldVersion = 1;
                 end
 
-                o.JavaBit   = ParforProgressServer2.createServer(s, n, percentage);
+                o.JavaBit   = ParforProgressServer2.createServer(s, n, percentage, use_gui);
                 o.Port      = double(o.JavaBit.getPort());
                 
                 % Get the client host name from pctconfig - needs
@@ -92,7 +96,7 @@ classdef ParforProgress2 < handle
                 o.DEBUG = do_debug;
                 
             else
-                error( 'Public constructor is: ParforProgress2(''Text'', N, percentage, do_debug)' );
+                error( 'Public constructor is: ParforProgress2(''Text'', N, percentage, do_debug, use_gui)' );
             end
         end
         

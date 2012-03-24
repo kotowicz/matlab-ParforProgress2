@@ -50,23 +50,39 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
         do_debug = 0;
     end
 
-    %% check for old matlab versions.
-    % - everything before 2008b (7.7) can cause trouble (because of saveobj /
-    % loadobj)
-    % - Sometimes we also had problems with windows systems where the 
-    % javaaddpath doesn't seem to work with matlabpool. This should be
-    % fixed now.
-    % - We also need to check if we are running in a text console or if X 
-    % is here.
-    % - In addition, jvm might be disabled.
-    OldVersion = 0;
-    if get_matlab_version() < 7.07 || usejava('awt') == 0 %|| IsWindows == 1
-        OldVersion = 1;
+    %% determine whether java and awt are available
+    java_enabled = 1;
+    if usejava('jvm') == 0
+        java_enabled = 0;
     end
     
-    no_java = 0;
-    if usejava('jvm') == 0
-        no_java = 1;
+    awt_available = 1;
+    if usejava('awt') == 0
+        awt_available = 0;
+    end
+    
+    %% check for different usage scenarios:
+    
+    % 1 = ParforProgress2(GUI)
+    % 2 = ParforProgress2(CONSOLE)
+    % 3 = fallback ParforProgressConsole2
+    
+    % by default we use the GUI
+    version_to_use = 1;
+    
+    if java_enabled == 0 % no java -> use console only
+        version_to_use = 3;
+    else
+        if awt_available == 0 % java but no AWT -> java console
+            version_to_use = 2;
+        end
+    end
+    
+    % check for old matlab version
+    % - everything before 2008b (7.7) can cause trouble (because of saveobj /
+    % loadobj)
+    if get_matlab_version() < 7.07
+        version_to_use = 3;
     end
     
     %% add directory to javapath and path
@@ -75,23 +91,32 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     
     pool_slaves = pool_size();
     if pool_slaves > 0
-        if no_java == 0
+        if java_enabled == 1
             pctRunOnAll(['javaaddpath({''' dir_to_add '''})']);
         end
         pctRunOnAll(['addpath(''' dir_to_add ''')']);
     else
-        if no_java == 0
+        if java_enabled == 1
             javaaddpath({dir_to_add});
         end
         addpath(dir_to_add);
     end
     
     %%
-    if OldVersion == 1
-        disp('Progress will update in arbitrary order.');
-        ppm = ParforProgressConsole2(s, n, percentage);
-    else
-        ppm = ParforProgress2(s, n, percentage, do_debug);
+    switch version_to_use
+        case 1
+            use_gui = 1;
+            ppm = ParforProgress2(s, n, percentage, do_debug, use_gui);
+        case 2
+            use_gui = 0;            
+            ppm = ParforProgress2(s, n, percentage, do_debug, use_gui);
+        case 3
+            % no java, no awt, or old matlab version
+            disp('Progress will update in arbitrary order.');
+            ppm = ParforProgressConsole2(s, n, percentage);
+        otherwise
+            disp('not defined');
+            ppm = [];
     end
     
 end

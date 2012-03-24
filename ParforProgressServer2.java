@@ -55,21 +55,22 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 	private String ETA_string = ETA_string_default;
 	private String runtime_prev = "Os";
 
+	private boolean USE_GUI = true;
 	private int counter;
-    private int DEBUG = 0;
+	private int DEBUG = 0;
     
-    private boolean listening = true;
+	private boolean listening = true;
 
-    private Thread fThread;
-    private AtomicBoolean fKeepGoing;
+	private Thread fThread;
+	private AtomicBoolean fKeepGoing;
     
-    private Timer gui_timer; // the timer updating the run time
+	private Timer gui_timer; // the timer updating the run time
 	
 	public synchronized int CountUp(){
 		return counter++;
 	}
     
-    private boolean started_from_console = false;
+	private boolean started_from_console = false;
     
 	public synchronized boolean set_started_from_console(){
         started_from_console = true;
@@ -80,22 +81,40 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 		return started_from_console;
 	}      
     
-    public synchronized void updateGUI(){
+	public synchronized void updateGUI(){
         
-        // update percentage text
-        fBar.setValue(counter);
-        if (DEBUG == 1)
-            fFrame.setTitle("counter: " +  counter);
+        if (USE_GUI == true) {
+            // update percentage text
+            fBar.setValue(counter);
+            if (DEBUG == 1)
+                fFrame.setTitle("counter: " +  counter);
+        }
         
         // calculate fraction & update timebar
         int reminder = (int)( counter % fraction_all );
-        if (reminder == 0) {
-            ETA_string = "ETA: " + ETA(fBar.getMaximum());
+        
+        if (USE_GUI == true) {
+            if (reminder == 0) {
+                ETA_string = "ETA: " + ETA(fBar.getMaximum());
+            }
         }
         
+        if (USE_GUI == false) {
+            ETA_string = "ETA: " + ETA((int)goal);
+            System.out.print("\r\r");
+            System.out.print(ETA_string);
+        }
+        
+        
         // We are done with all loops
-        if (counter == fBar.getMaximum()) {
-            done_from_GUI();
+        if (USE_GUI == true) {
+            if (counter == fBar.getMaximum()) {
+                done_from_GUI();
+            }
+        } else {
+            if (counter == (int)goal) {
+                done_from_GUI();
+            }
         }
     }
 
@@ -166,14 +185,15 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
      * Create a "server" progress monitor - this runs on the desktop client and
      * pops up the progress monitor UI.
      */
-    public static ParforProgressServer2 createServer(String s, int N, double update_percentage) throws IOException {
+    public static ParforProgressServer2 createServer(String s, int N, double update_percentage, boolean use_gui) throws IOException {
         ParforProgressServer2 ret = new ParforProgressServer2();
-        ret.setup(s, N, update_percentage, 0);
+        int show_port = 0;
+        ret.setup(s, N, update_percentage, show_port, use_gui);
         ret.start();
         return ret;
     }    
     
-	private void StartGUI(String s, int N, double update_percentage ) {
+	private void SetupServer(String s, int N, double update_percentage, boolean use_gui) {
 		
         /* override user specified "update_percentage" if it doesn't make
          * any sense
@@ -184,35 +204,42 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
             update_percentage = 0.1;
         }
         
-        taskname = s;
+
+        USE_GUI = use_gui;
         
-		// build the UI
-		fFrame = new JFrame(taskname);
-		fLabel = new JLabel(taskname);
-		fBar   = new JProgressBar(0, N);
-		fBar.setStringPainted(true);
-		fFrame.setLayout(new GridLayout(2, 1));
-		fFrame.getContentPane().add(fLabel);
-		fFrame.getContentPane().add(fBar);
-		fFrame.pack();
-		fFrame.setLocationRelativeTo(null);
-		
-		fFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-		fFrame.addWindowListener(new WindowAdapter() {
-			public void windowClosing(WindowEvent e) {
-				if (JOptionPane.showConfirmDialog(new JFrame(),
-						"Are you sure you want to close the progressbar window?\n"
-						+ "Your computation will continue but you'll have no clue\n"
-						+ "about its progress.", "You are about to close the progressbar window",
-				        JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
-					fFrame.dispose();
-				}
-			}
-		});
-		
-		fFrame.setSize(300, 75);
-		fFrame.setVisible(true);
-		fFrame.setResizable(true); 
+        if (USE_GUI == true) {
+            
+            taskname = s;
+            
+            // build the UI
+            fFrame = new JFrame(taskname);
+            fLabel = new JLabel(taskname);
+            fBar   = new JProgressBar(0, N);
+            fBar.setStringPainted(true);
+            fFrame.setLayout(new GridLayout(2, 1));
+            fFrame.getContentPane().add(fLabel);
+            fFrame.getContentPane().add(fBar);
+            fFrame.pack();
+            fFrame.setLocationRelativeTo(null);
+            
+            fFrame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+            fFrame.addWindowListener(new WindowAdapter() {
+                public void windowClosing(WindowEvent e) {
+                    if (JOptionPane.showConfirmDialog(new JFrame(),
+                    "Are you sure you want to close the progressbar window?\n"
+                    + "Your computation will continue but you'll have no clue\n"
+                    + "about its progress.", "You are about to close the progressbar window",
+                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                        fFrame.dispose();
+                    }
+                }
+            });
+            
+            fFrame.setSize(300, 75);
+            fFrame.setVisible(true);
+            fFrame.setResizable(true);
+            
+        }
         
         // how much do we have to do?
         goal = N;
@@ -262,7 +289,9 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         }
         
         ParforProgressServer2 myserver = new ParforProgressServer2();
-        myserver.setup(displayString, totalNumberRuns, updateEachPercent, 1);
+        int show_port = 1;
+        boolean use_gui = true;
+        myserver.setup(displayString, totalNumberRuns, updateEachPercent, show_port, use_gui);
         myserver.start();
     }
 
@@ -270,7 +299,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         return ((InetSocketAddress)serverSocket.socket().getLocalSocketAddress()).getPort();
     }
     
-    public void setup(String s, int N, double update_percentage, int show_port) { 
+    public void setup(String s, int N, double update_percentage, int show_port, boolean use_gui) { 
 
         serverSocket = null;
         
@@ -290,7 +319,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
             if (DEBUG == 1 || show_port == 1)
                 System.err.println("ParforProgressServer2: Server started on port " + getPort() );
             
-            StartGUI(s, N, update_percentage);
+            SetupServer(s, N, update_percentage, use_gui);
             
         } catch (IOException e) {
             System.err.println("ParforProgressServer2: error while calling setup().");
@@ -308,6 +337,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         
         gui_timer = new Timer(update_timer_each_ms, this);
         gui_timer.start();
+
     }
     
     /**
@@ -397,7 +427,8 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         listening = false;
         gui_timer.stop();
         fKeepGoing.set(false);
-        fFrame.dispose();
+        if (USE_GUI == true)
+            fFrame.dispose();
     }
     
     public void show_execution_time() {
@@ -417,8 +448,14 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
                 ETA_time = Round(ETA_time - update_timer_each_s, 2);
                 ETA_string = "ETA: " + ETA_time + "s";
             }
-            fFrame.setTitle("Runtime: " + new_time + " - " + ETA_string);            
+            if (USE_GUI == true) {
+                fFrame.setTitle("Runtime: " + new_time + " - " + ETA_string);
+            } else {
+                System.out.print("\r\r");
+                System.out.print("Runtime: " + new_time + " - " + ETA_string);
+            }
             runtime_prev = new_time;
+            
         }
     }
     
