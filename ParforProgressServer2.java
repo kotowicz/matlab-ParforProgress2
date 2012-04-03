@@ -42,6 +42,8 @@ import javax.swing.Timer;
 import java.awt.GridLayout;
 import java.awt.event.*;
 
+import java.io.Console;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParforProgressServer2 implements Runnable, ActionListener {
@@ -59,7 +61,8 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 	private int counter;
 	private int DEBUG = 0;
 	private AtomicBoolean show_execution_time_executed;
-	private AtomicBoolean stop_program_executed;    
+	private AtomicBoolean stop_program_executed;
+	private Console console;
     
 	private boolean listening = true;
 
@@ -74,16 +77,16 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     
 	private boolean started_from_console = false;
     
-	public synchronized boolean set_started_from_console(){
+	public synchronized boolean set_started_from_console() {
         started_from_console = true;
 		return started_from_console;
 	}    
     
-	public synchronized boolean get_started_from_console(){
+	public synchronized boolean get_started_from_console() {
 		return started_from_console;
 	}
     
-	public synchronized int return_goal(){
+	public synchronized int return_goal() {
 		if (USE_GUI == true) {
 			return fBar.getMaximum();
 		} else {
@@ -91,7 +94,17 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 			// the 'goal' value.
 			return (int) goal;
 		}
-	}    
+	}
+	
+	public void write_to_console(String s) {
+		// use 'console' if possible, otherwise use fallback 'System.out'
+		if (console == null) {
+			System.out.print(s);
+		} else {
+            // 'console' works with parfor loops!
+			console.printf(s);
+		}
+	}
     
 	public synchronized void updateGUI(){
         
@@ -113,8 +126,8 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 				String new_time = CurrentRuntime(0);
 				// update console only if run time has changed
 				if (runtime_prev.equals(new_time) == false) {
-					System.out.print("\r\r\r");
-					System.out.print("Runtime: " + new_time + " - " + ETA_string + "    ");
+					write_to_console("\r\r\r");
+					write_to_console("Runtime: " + new_time + " - " + ETA_string + "    ");
 				}
 				runtime_prev = new_time;
             }
@@ -351,6 +364,9 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         
         show_execution_time_executed = new AtomicBoolean(false);
         stop_program_executed = new AtomicBoolean(false);
+        
+        // initialize console output
+        console = System.console();
 
     }
     
@@ -454,7 +470,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 				fFrame.dispose();
 			} else {
 				// overwrite any characters that might be left over from showing runtime & ETA
-				System.out.print("\r                                    ");
+				write_to_console("\r                                    \r");
 			}
             
         }
@@ -499,7 +515,9 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     
     
     /* 
-     * this method will be used if matlabpool is OFF
+     * this method will be used directly if matlabpool is OFF, or in case 
+     * matlabpool is ON, ParforProgressClient2 will connect to this server 
+     * and 'run()' will call 'this.increment()'.
      */
     public synchronized void increment() {
         if (DEBUG == 2)
@@ -507,7 +525,6 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 
         CountUp();
         updateGUI();
-
     }
     
     

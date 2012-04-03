@@ -80,11 +80,7 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
         version_to_use = 3;
     else
         if awt_available == 0 % java but no AWT -> java console
-            if pool_slaves == 0 % no workers -> synchronized output.
-                version_to_use = 2;
-            else % workers -> non-synchronized output.
-                version_to_use = 3;
-            end
+            version_to_use = 2;
         end
     end
     

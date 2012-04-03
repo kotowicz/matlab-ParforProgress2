@@ -5,11 +5,12 @@
 % most of the code here is from:
 % http://www.mathworks.com/matlabcentral/fileexchange/24594-parfor-progress-monitor
 %
-% ParforProgress2 - M object to make ParforProgressMonitorMod objects easier to
-% use. Create one of these on the client outside your PARFOR loop with a
-% name for the window. Pass it in to the PARFOR loop, and have the workers
-% call "increment" at the end of each iteration. This sends notification
-% back to the client which then updates the GUI.
+% ParforProgress2 - M object to make 'ParforProgressClient2' and 
+% 'ParforProgressServer2' objects easier to use. Create one of these on the 
+% client outside your PARFOR loop with a name for the window. Pass the 
+% object to the PARFOR loop, and have the workers call "increment" at the 
+% end of each iteration. This sends a notification back to the server which 
+% then updates the GUI.
 %
 % Example:
 %
@@ -110,11 +111,11 @@ classdef ParforProgress2 < handle
         end
         
         function increment(o, i) %#ok<INUSD>
-        % i is a fake input so we are compatible with
+        % i is a fake input so we stay compatible with
         % "ParforProgressConsole2.m"
         
-            % somethings wrong with matlab 2008a and the saveobj /
-            % loadobj methods. there is no 'JavaBit' in the 'o' if you
+            % Something is wrong with matlab 2008a and the saveobj /
+            % loadobj methods. There is no 'JavaBit' in the 'o' if you
             % have matlabpool enabled.
             if o.OldVersion == 0
                 o.JavaBit.increment();
