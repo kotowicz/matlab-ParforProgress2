@@ -29,7 +29,10 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
 %       ppm.increment(i);
 %   end
 %
-%   delete(ppm);
+%   try % use try / catch here, since delete(struct) will raise an error.
+%       delete(ppm);
+%   catch me %#ok<NASGU>
+%   end
 %
 % 
 % Copyright (c) 2010-2012, Andreas Kotowicz
@@ -61,6 +64,9 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
         awt_available = 0;
     end
     
+    % is matlab pool active?
+    pool_slaves = pool_size();
+    
     %% check for different usage scenarios:
     
     % 1 = ParforProgress2(GUI)
@@ -74,7 +80,11 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
         version_to_use = 3;
     else
         if awt_available == 0 % java but no AWT -> java console
-            version_to_use = 2;
+            if pool_slaves == 0 % no workers -> synchronized output.
+                version_to_use = 2;
+            else % workers -> non-synchronized output.
+                version_to_use = 3;
+            end
         end
     end
     
@@ -89,7 +99,6 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     a = which(mfilename);
     dir_to_add = fileparts(a);
     
-    pool_slaves = pool_size();
     if pool_slaves > 0
         if java_enabled == 1
             pctRunOnAll(['javaaddpath({''' dir_to_add '''})']);

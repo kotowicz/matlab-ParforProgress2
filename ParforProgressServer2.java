@@ -58,6 +58,8 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 	private boolean USE_GUI = true;
 	private int counter;
 	private int DEBUG = 0;
+	private AtomicBoolean show_execution_time_executed;
+	private AtomicBoolean stop_program_executed;    
     
 	private boolean listening = true;
 
@@ -79,7 +81,17 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     
 	public synchronized boolean get_started_from_console(){
 		return started_from_console;
-	}      
+	}
+    
+	public synchronized int return_goal(){
+		if (USE_GUI == true) {
+			return fBar.getMaximum();
+		} else {
+			// same as above, but since 'fBar' does not exist we return
+			// the 'goal' value.
+			return (int) goal;
+		}
+	}    
     
 	public synchronized void updateGUI(){
         
@@ -93,29 +105,26 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         // calculate fraction & update timebar
         int reminder = (int)( counter % fraction_all );
         
-        if (USE_GUI == true) {
-            if (reminder == 0) {
-                ETA_string = "ETA: " + ETA(fBar.getMaximum());
+        if (reminder == 0) {
+            ETA_string = "ETA: " + ETA(return_goal());
+            if (USE_GUI == false) {
+				// show current runtime in console mode, since 'update_runtime' 
+				// is not running.
+				String new_time = CurrentRuntime(0);
+				// update console only if run time has changed
+				if (runtime_prev.equals(new_time) == false) {
+					System.out.print("\r\r\r");
+					System.out.print("Runtime: " + new_time + " - " + ETA_string + "    ");
+				}
+				runtime_prev = new_time;
             }
         }
-        
-        if (USE_GUI == false) {
-            ETA_string = "ETA: " + ETA((int)goal);
-            System.out.print("\r\r");
-            System.out.print(ETA_string);
-        }
-        
         
         // We are done with all loops
-        if (USE_GUI == true) {
-            if (counter == fBar.getMaximum()) {
-                done_from_GUI();
-            }
-        } else {
-            if (counter == (int)goal) {
-                done_from_GUI();
-            }
+        if (counter == return_goal()) {
+            done_from_GUI();
         }
+
     }
 
     private double goal;
@@ -335,8 +344,13 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         // Used to indicate to fThread when it's time to go
         fKeepGoing = new AtomicBoolean(true);
         
-        gui_timer = new Timer(update_timer_each_ms, this);
-        gui_timer.start();
+        if (use_gui == true) {
+            gui_timer = new Timer(update_timer_each_ms, this);
+            gui_timer.start();
+        }
+        
+        show_execution_time_executed = new AtomicBoolean(false);
+        stop_program_executed = new AtomicBoolean(false);
 
     }
     
@@ -407,6 +421,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     
     // called from matlab's delete()
     public void done() {
+        // System.out.println("called done()");
         show_execution_time();
         stop_program();
     }
@@ -419,26 +434,48 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         if (get_started_from_console() == true) {
             show_execution_time();
         }
+        // System.out.println("called done_from_GUI()");        
         stop_program();
     }
     
     // the real code that stops everything
     public void stop_program() {
-        listening = false;
-        gui_timer.stop();
-        fKeepGoing.set(false);
-        if (USE_GUI == true)
-            fFrame.dispose();
+        if (stop_program_executed.get() == false) {
+
+			// stop all timers & threads
+            stop_program_executed.set(true);
+            listening = false;
+            if (USE_GUI == true) {
+                gui_timer.stop();
+            }
+            fKeepGoing.set(false);
+            
+			if (USE_GUI == true) {
+				fFrame.dispose();
+			} else {
+				// overwrite any characters that might be left over from showing runtime & ETA
+				System.out.print("\r                                    ");
+			}
+            
+        }
     }
     
     public void show_execution_time() {
-        System.out.flush();
-        System.err.println("\n" + "  >> execution time was " + CurrentRuntime(2) + ".\n");
-        System.err.flush();
+        if (show_execution_time_executed.get() == false) {
+            
+            show_execution_time_executed.set(true);
+            
+            System.out.flush();
+            System.err.println("\n" + "  >> execution time was " + CurrentRuntime(2) + ".\n");
+            System.err.flush();
+            
+        }
     }
 
     
     public void update_runtime() {
+    // this function is called periodically by 'gui_timer'
+        
         // tell user how much time has already passed.
         String new_time = CurrentRuntime(0);
         
@@ -448,11 +485,12 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
                 ETA_time = Round(ETA_time - update_timer_each_s, 2);
                 ETA_string = "ETA: " + ETA_time + "s";
             }
+            
+            /* this check is not really necessary, since 'update_runtime' 
+               won't be called if in non-GUI mode - but maybe I'll change 
+               this in the future.*/
             if (USE_GUI == true) {
                 fFrame.setTitle("Runtime: " + new_time + " - " + ETA_string);
-            } else {
-                System.out.print("\r\r");
-                System.out.print("Runtime: " + new_time + " - " + ETA_string);
             }
             runtime_prev = new_time;
             
