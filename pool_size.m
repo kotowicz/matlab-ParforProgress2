@@ -7,16 +7,18 @@ function [x, active] = pool_size()
     %% get matlabpool size - this should work for ALL matlab versions
     try
         session = com.mathworks.toolbox.distcomp.pmode.SessionFactory.getCurrentSession;
-
+        
+        x = 0;
         if ~isempty( session ) && session.isSessionRunning() && session.isPoolManagerSession()
-            client = distcomp.getInteractiveObject();
-            if strcmp( client.CurrentInteractiveType, 'matlabpool' )
-                x = session.getLabs().getNumLabs();
-            else
-                x = 0;
+            
+            try % works with matlab >= 2009b AND 2013a
+                x = session.getPoolSize();
+            catch % works with matlab < 2013a
+                client = distcomp.getInteractiveObject();
+                if strcmp( client.CurrentInteractiveType, 'matlabpool' )
+                    x = session.getLabs().getNumLabs();
+                end
             end
-        else
-            x = 0;
         end
 
     catch me %#ok<NASGU>
