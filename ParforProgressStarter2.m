@@ -96,12 +96,12 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     dir_to_add = fileparts(a);
     
     if pool_slaves > 0
-        if java_enabled == 1
+        if java_enabled == 1 && ~exist('ParforProgressServer2', 'class')
             pctRunOnAll(['javaaddpath({''' dir_to_add '''})']);
         end
         pctRunOnAll(['addpath(''' dir_to_add ''')']);
     else
-        if java_enabled == 1
+        if java_enabled == 1 && ~exist('ParforProgressServer2', 'class')
             javaaddpath({dir_to_add});
         end
         addpath(dir_to_add);
