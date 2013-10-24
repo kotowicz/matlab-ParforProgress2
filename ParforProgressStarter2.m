@@ -73,7 +73,7 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     % 2 = ParforProgress2(CONSOLE)
     % 3 = fallback ParforProgressConsole2
     
-    % by default we use the GUI
+    % by default we use the GUI version.
     version_to_use = 1;
     
     if java_enabled == 0 % no java -> use console only
@@ -94,14 +94,15 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     %% add directory to javapath and path
     a = which(mfilename);
     dir_to_add = fileparts(a);
+    server_class_loaded = exist('ParforProgressServer2', 'class');
     
     if pool_slaves > 0
-        if java_enabled == 1 && ~exist('ParforProgressServer2', 'class')
+        if java_enabled == 1 && ~server_class_loaded
             pctRunOnAll(['javaaddpath({''' dir_to_add '''})']);
         end
         pctRunOnAll(['addpath(''' dir_to_add ''')']);
     else
-        if java_enabled == 1 && ~exist('ParforProgressServer2', 'class')
+        if java_enabled == 1 && ~server_class_loaded
             javaaddpath({dir_to_add});
         end
         addpath(dir_to_add);
