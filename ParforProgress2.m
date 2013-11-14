@@ -23,7 +23,7 @@
 % delete(ppm);
 %
 %
-% Copyright (c) 2010-2012, Andreas Kotowicz
+% Copyright (c) 2010-2013, Andreas Kotowicz
 
 classdef ParforProgress2 < handle
 
@@ -116,7 +116,7 @@ classdef ParforProgress2 < handle
         
             % Something is wrong with matlab 2008a and the saveobj /
             % loadobj methods. There is no 'JavaBit' in the 'o' if you
-            % have matlabpool enabled.
+            % have matlabpool (<= 2013a) / parpool (>= 2013b) enabled.
             if o.OldVersion == 0
                 o.JavaBit.increment();
             end
@@ -127,7 +127,7 @@ classdef ParforProgress2 < handle
         % Close the UI
             % somethings wrong with matlab 2008a and the saveobj /
             % loadobj methods. there is no 'JavaBit' in the 'o' if you
-            % have matlabpool enabled.
+            % have matlabpool (<= 2013a) / parpool (>= 2013b) enabled.
             if o.OldVersion == 0
                 o.JavaBit.done();
             end

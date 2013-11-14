@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, Andreas Kotowicz
+ * Copyright (c) 2010-2013, Andreas Kotowicz
  *
  *
  * ideas for this code are from:
@@ -400,10 +400,10 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
                         
                         try {
                             // this line will be called only once, if
-                            // 'matlabpool' is OFF.
+                            // 'matlabpool' / 'parpool' is OFF.
                             sc = serverSocket.accept();
-                            // this code will only be called if 'matlabpool' 
-                            // is ON.
+                            // this code will only be called if 'matlabpool' / 
+                            // 'parpool' is ON.
                             if (sc != null) {
                                 this.increment();
                                 sc.close();
@@ -515,8 +515,9 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     
     
     /* 
-     * this method will be used directly if matlabpool is OFF, or in case 
-     * matlabpool is ON, ParforProgressClient2 will connect to this server 
+     * this method will be used directly if matlabpool / parpool is OFF, or in 
+     * case matlabpool / parpool is ON, ParforProgressClient2 will connect to 
+     * this server 
      * and 'run()' will call 'this.increment()'.
      */
     public synchronized void increment() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2012, Andreas Kotowicz
+ * Copyright (c) 2010-2013, Andreas Kotowicz
  *
  *
  * ideas for this code are from:
@@ -42,7 +42,7 @@ import java.net.*;
  *
  * OR
  *
- *  2) you have 'matlabpool' running
+ *  2) you have 'matlabpool' (<= 2013a) / 'parpool' (>= 2013b) running.
  *
  *
  */
@@ -94,7 +94,7 @@ public class ParforProgressClient2 {
     
     
     /* 
-     * this method will be used if matlabpool is ON
+     * this method will be used if matlabpool / parpool is ON
      */
     public void increment() {
 

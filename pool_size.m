@@ -1,10 +1,10 @@
 function [x, active] = pool_size()
-%POOL_SIZE - temporary hack to return size of current MATLABPOOL
+%POOL_SIZE - temporary hack to return size of current MATLABPOOL / PARPOOL
 %
 % see:
 % http://www.mathworks.com/support/solutions/en/data/1-5UDHQP/index.html?product=DM&solution=1-5UDHQP
 
-    %% get matlabpool size - this should work for ALL matlab versions
+    %% get pool size - this should work for ALL matlab versions
     try
         session = com.mathworks.toolbox.distcomp.pmode.SessionFactory.getCurrentSession;
         
@@ -28,7 +28,7 @@ function [x, active] = pool_size()
     end
     
 
-    %% matlabpool active?
+    %% is matlabpool / parpool active?
     active = 0;
     if x > 0
         active = 1;

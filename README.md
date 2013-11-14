@@ -1,8 +1,8 @@
 ## A) ABOUT
 
-This is version 0.2 of my simple parfor progress monitor for matlab. See also http://www.mathworks.com/matlabcentral/fileexchange/35609-matlab-parforprogress2.
+This is version 0.2.1 of ParforProgress2, a simple parfor progress monitor for matlab. See also http://www.mathworks.com/matlabcentral/fileexchange/35609-matlab-parforprogress2.
 
-This progress monitor comes with a nice wrapper `ParforProgressStarter2.m` which will take care of adding the classes to the java class path, depending on whether matlabpool is enabled or not.
+This progress monitor comes with a nice wrapper `ParforProgressStarter2.m` which will take care of adding the classes to the java class path, depending on whether matlabpool / parpool is enabled or not.
 
 ## B) SETUP
 
