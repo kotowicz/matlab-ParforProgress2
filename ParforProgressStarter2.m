@@ -1,4 +1,4 @@
-function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
+function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath)
 % Starter function for parfor progress-monitor, that will automatically 
 % choose between a text or a GUI progress monitor. You can use this 
 % progress-monitor in both for and parfor loops.
@@ -6,11 +6,21 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
 % ParforProgressStarter2 is the successor of ParforProgressStarter - it is 
 % roughly 12 times more performant during GUI mode!
 % 
-% you should use it like this:
-% 
+% You should use ParforProgressStarter2 like this:
+%
+%%%%%%%%%%%%%% Begin ParforProgressStarter2 suggested usage %%%%%%%%%%%%%%%
+%
+%   % how many iterations of the for loop do we expect?
 %   N = 1000;
+%   % how often should the monitor update it's progress?
+%   percentage_update = 0.1;
+%   % show debugging information.
+%   do_debug = 1;
+%   % by default we always run 'javaaddpath'. Set this to 0 if you are 
+%   % making use of globals.
+%   run_javaaddpath = 1; 
 %   try % Initialization
-%       ppm = ParforProgressStarter2('test', N, 0.1);
+%       ppm = ParforProgressStarter2('test', N, percentage_update, do_debug, run_javaaddpath);
 %   catch me % make sure "ParforProgressStarter2" didn't get moved to a different directory
 %       if strcmp(me.message, 'Undefined function or method ''ParforProgressStarter2'' for input arguments of type ''char''.')
 %           error('ParforProgressStarter2 not in path.');
@@ -34,13 +44,14 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
 %   catch me %#ok<NASGU>
 %   end
 %
+%%%%%%%%%%%%%% End ParforProgressStarter2 suggested usage %%%%%%%%%%%%%%%%%
 % 
 % Copyright (c) 2010-2014, Andreas Kotowicz
 %
     %%
 
     if nargin < 2
-        disp('usage: ppm = ParforProgressStarter2( text, number_runs, update_percentage)');
+        disp('usage: ppm = ParforProgressStarter2( text, number_runs, update_percentage, do_debug, run_javaaddpath )');
         ppm = [];
         return;
     end
@@ -51,6 +62,10 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     
     if nargin < 4
         do_debug = 0;
+    end
+    
+    if nargin < 5
+        run_javaaddpath = 1;
     end
 
     %% determine whether java and awt are available
@@ -94,15 +109,14 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     %% add directory to javapath and path
     a = which(mfilename);
     dir_to_add = fileparts(a);
-    server_class_loaded = exist('ParforProgressServer2', 'class');
     
     if pool_slaves > 0
-        if java_enabled == 1 %&& ~server_class_loaded
+        if java_enabled == 1 && run_javaaddpath == 1
             pctRunOnAll(['javaaddpath({''' dir_to_add '''})']);
         end
         pctRunOnAll(['addpath(''' dir_to_add ''')']);
     else
-        if java_enabled == 1 %&& ~server_class_loaded
+        if java_enabled == 1 && run_javaaddpath == 1
             javaaddpath({dir_to_add});
         end
         addpath(dir_to_add);
