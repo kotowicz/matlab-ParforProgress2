@@ -3,7 +3,7 @@ function ParforProgressStressTest2(N)
 % use this function to determine how many simultaneous connections your
 % computer can handle, and adjust the ppm.increment() call accordingly.
 %
-% Copyright (c) 2010-2013, Andreas Kotowicz
+% Copyright (c) 2010-2014, Andreas Kotowicz
 %
 %%
     if nargin < 1

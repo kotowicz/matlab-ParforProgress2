@@ -35,7 +35,7 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
 %   end
 %
 % 
-% Copyright (c) 2010-2013, Andreas Kotowicz
+% Copyright (c) 2010-2014, Andreas Kotowicz
 %
     %%
 
@@ -97,12 +97,12 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug)
     server_class_loaded = exist('ParforProgressServer2', 'class');
     
     if pool_slaves > 0
-        if java_enabled == 1 && ~server_class_loaded
+        if java_enabled == 1 %&& ~server_class_loaded
             pctRunOnAll(['javaaddpath({''' dir_to_add '''})']);
         end
         pctRunOnAll(['addpath(''' dir_to_add ''')']);
     else
-        if java_enabled == 1 && ~server_class_loaded
+        if java_enabled == 1 %&& ~server_class_loaded
             javaaddpath({dir_to_add});
         end
         addpath(dir_to_add);

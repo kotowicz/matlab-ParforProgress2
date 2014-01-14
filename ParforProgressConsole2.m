@@ -3,7 +3,7 @@ classdef ParforProgressConsole2 < handle
 % use ParforProgressStarter() instead.    
 % not using saveobj and loadobj, because old matlab versions have problems
 % with it.
-% Copyright (c) 2010-2013, Andreas Kotowicz
+% Copyright (c) 2010-2014, Andreas Kotowicz
 
     properties (GetAccess = private, SetAccess = private)
         message
