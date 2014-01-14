@@ -1,22 +1,36 @@
-## A) ABOUT
+## A) About
 
-This is version 0.2.2 of ParforProgress2, a simple parfor progress monitor for matlab. See also http://www.mathworks.com/matlabcentral/fileexchange/35609-matlab-parforprogress2.
+This is version 0.2.5 of `ParforProgress2`, a simple parfor progress monitor for matlab. See also http://www.mathworks.com/matlabcentral/fileexchange/35609-matlab-parforprogress2.
 
-This progress monitor comes with a nice wrapper `ParforProgressStarter2.m` which will take care of adding the classes to the java class path, depending on whether matlabpool / parpool is enabled or not.
+This progress monitor comes with a nice wrapper [`ParforProgressStarter2.m`](ParforProgressStarter2.m) which will take care of adding the classes to the java class path, depending on whether matlabpool / parpool is enabled or not.
 
-## B) SETUP
+## B) Setup
 
 * clone this directory 
-* add directory to matlab path
+* add directory to matlab path: `addpath('/path/to/matlab-ParforProgress2')`
 
-## C) HOW TO USE (no globals)
+## C) How to use
+By default `ParforProgress2` is very easy to use: 
 
-see `ParforProgressStressTest2.m` or `ParforProgressStarter2.m`
+1) add program location to matlab path  
+2) run `ParforProgress2`.  
+See *C1 - no globals* below for details.  
+
+In case your Matlab programs make use of `global` variables, things are a bit more complicated. See *C2 - with globals* below for details.  
 
 
-## D) HOW TO USE (with globals)
+### C1) no globals
 
-### Matlab 2012b and later:
+See [`ParforProgressStressTest2.m`](ParforProgressStressTest2.m) or [`ParforProgressStarter2.m`](ParforProgressStarter2.m) for usage instructions.
+
+
+### C2) with globals
+`ParforProgress2` makes use of `javaaddpath` and `javaclasspath`. Using either of these functions makes Matlab call `clear java` which does clear all global variables. This Matlab behaviour is intentional. See http://www.mathworks.com/help/matlab/matlab_external/bringing-java-classes-and-methods-into-matlab-workspace.html for details.
+
+In order to make `ParforProgress2` work with globals, see the following instructions, which depend on your used Matlab version.
+
+
+#### C2.1) Matlab 2012b and later:
 - create `javaclasspath.txt` file in your preference directory.
 - add path to `ParforProgressStarter2` to this file.
 
@@ -34,7 +48,7 @@ Next, startup Matlab and call `ParforProgressStarter2`, but do not run `javaddpa
 ```
 
 
-### Matlab 2012a and earlier:
+#### C2.2) Matlab 2012a and earlier:
 
 Unfortunately Matlab 2012a and earlier versions of Matlab do not support customized
 `javaclasspath.txt` files, instead, you need to edit the `classpath.txt` file that is
@@ -48,6 +62,5 @@ edit this file. Here's how you can locate it:
 ```
 
 
-See http://www.mathworks.com/help/matlab/matlab_external/bringing-java-classes-and-methods-into-matlab-workspace.html for further information regarding `javaclasspath`.
 
 
