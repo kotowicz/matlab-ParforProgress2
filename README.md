@@ -42,13 +42,22 @@ $ echo "/path/to/matlab-ParforProgress2" > javaclasspath.txt
 
 Next, startup Matlab and call `ParforProgressStarter2`, but do not run `javaddpath`:
 
+
 ```
  >> run_javaaddpath = 0;
  >> s = 'dummy task';
  >> n = 100;
  >> percentage = 0.1;
  >> do_debug = 0;
- >> ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath)
+ >>
+ >> ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath)
+ >> 
+ >> for j = 1 : n
+ >>     your_computation();
+ >>     ppm.increment(i); 
+ >> end
+ >>
+ >> delete(ppm);
 ```
 
 
