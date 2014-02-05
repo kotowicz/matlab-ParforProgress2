@@ -44,7 +44,11 @@ Next, startup Matlab and call `ParforProgressStarter2`, but do not run `javaddpa
 
 ```
  >> run_javaaddpath = 0;
- >> ParforProgressStressTest2(10000, run_javaaddpath)
+ >> s = 'dummy task';
+ >> n = 100;
+ >> percentage = 0.1;
+ >> do_debug = 0;
+ >> ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath)
 ```
 
 
