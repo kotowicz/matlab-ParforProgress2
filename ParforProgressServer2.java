@@ -60,7 +60,8 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 	private boolean USE_GUI = true;
 	private int counter;
 	private int DEBUG = 0;
-	private AtomicBoolean show_execution_time_executed;
+	private AtomicBoolean enable_show_execution_time; // should we run / execute "show_execution_time"?
+	private AtomicBoolean show_execution_time_executed; // did we execute "show_execution_time"?
 	private AtomicBoolean stop_program_executed;
 	private Console console;
     
@@ -207,10 +208,10 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
      * Create a "server" progress monitor - this runs on the desktop client and
      * pops up the progress monitor UI.
      */
-    public static ParforProgressServer2 createServer(String s, int N, double update_percentage, boolean use_gui) throws IOException {
+    public static ParforProgressServer2 createServer(String s, int N, double update_percentage, boolean use_gui, boolean show_execution_time) throws IOException {
         ParforProgressServer2 ret = new ParforProgressServer2();
         int show_port = 0;
-        ret.setup(s, N, update_percentage, show_port, use_gui);
+        ret.setup(s, N, update_percentage, show_port, use_gui, show_execution_time);
         ret.start();
         return ret;
     }    
@@ -313,7 +314,8 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         ParforProgressServer2 myserver = new ParforProgressServer2();
         int show_port = 1;
         boolean use_gui = true;
-        myserver.setup(displayString, totalNumberRuns, updateEachPercent, show_port, use_gui);
+        boolean show_execution_time = true;
+        myserver.setup(displayString, totalNumberRuns, updateEachPercent, show_port, use_gui, show_execution_time);
         myserver.start();
     }
 
@@ -321,7 +323,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         return ((InetSocketAddress)serverSocket.socket().getLocalSocketAddress()).getPort();
     }
     
-    public void setup(String s, int N, double update_percentage, int show_port, boolean use_gui) { 
+    public void setup(String s, int N, double update_percentage, int show_port, boolean use_gui, boolean show_execution_time) { 
 
         serverSocket = null;
         
@@ -364,6 +366,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         
         show_execution_time_executed = new AtomicBoolean(false);
         stop_program_executed = new AtomicBoolean(false);
+        enable_show_execution_time = new AtomicBoolean(show_execution_time);
         
         // initialize console output
         console = System.console();
@@ -477,7 +480,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     }
     
     public void show_execution_time() {
-        if (show_execution_time_executed.get() == false) {
+        if (show_execution_time_executed.get() == false && enable_show_execution_time.get() == true) {
             
             show_execution_time_executed.set(true);
             

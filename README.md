@@ -1,6 +1,6 @@
 ## A) About
 
-This is version 0.2.7 of `ParforProgress2`, a simple parfor progress monitor for matlab. See also http://www.mathworks.com/matlabcentral/fileexchange/35609-matlab-parforprogress2.
+This is version 0.2.8 of `ParforProgress2`, a simple parfor progress monitor for matlab. See also http://www.mathworks.com/matlabcentral/fileexchange/35609-matlab-parforprogress2.
 
 This progress monitor comes with a nice wrapper [`ParforProgressStarter2.m`](ParforProgressStarter2.m) which will take care of adding the classes to the java class path, depending on whether matlabpool / parpool is enabled or not.
 
@@ -45,6 +45,7 @@ Next, startup Matlab and call `ParforProgressStarter2`, but do not run `javaddpa
 
 ```
  >> % setup parameters
+ >> show_execution_time = 1;
  >> run_javaaddpath = 0;
  >> s = 'dummy task';
  >> n = 100;
@@ -52,7 +53,7 @@ Next, startup Matlab and call `ParforProgressStarter2`, but do not run `javaddpa
  >> do_debug = 0;
  >>
  >> % initialize the ProgressMonitor
- >> ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath)
+ >> ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath, show_execution_time)
  >> 
  >> % run your computation
  >> for j = 1 : n

@@ -48,7 +48,7 @@ classdef ParforProgress2 < handle
     end
     
     methods
-        function o = ParforProgress2(s, n, percentage, do_debug, use_gui)
+        function o = ParforProgress2(s, n, percentage, do_debug, use_gui, show_execution_time)
         % ParforProgress Build a Parfor Progress Monitor
         % Use the syntax: ParforProgress( 'Window Title', N, percentage, do_debug, use_gui )
         % where N is the number of iterations in the PARFOR loop
@@ -60,7 +60,11 @@ classdef ParforProgress2 < handle
                 o.Port      = [];
              
             % initialize server
-            elseif (nargin == 5 || nargin == 4 || nargin == 3 || nargin == 2)
+            elseif (nargin == 6 || nargin == 5 || nargin == 4 || nargin == 3 || nargin == 2)
+                
+                if nargin < 6
+                    show_execution_time = 1;
+                end
                 
                 if nargin < 5
                     use_gui = 1;
@@ -79,7 +83,7 @@ classdef ParforProgress2 < handle
                     o.OldVersion = 1;
                 end
 
-                o.JavaBit   = ParforProgressServer2.createServer(s, n, percentage, use_gui);
+                o.JavaBit   = ParforProgressServer2.createServer(s, n, percentage, use_gui, show_execution_time);
                 o.Port      = double(o.JavaBit.getPort());
                 
                 % Get the client host name from pctconfig - needs

@@ -1,4 +1,4 @@
-function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath)
+function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath, show_execution_time)
 % Starter function for parfor progress-monitor, that will automatically 
 % choose between a text or a GUI progress monitor. You can use this 
 % progress-monitor in both for and parfor loops.
@@ -19,8 +19,10 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
 %   % by default we always run 'javaaddpath'. Set this to 0 if you are 
 %   % making use of globals.
 %   run_javaaddpath = 1; 
+%   % by default we show the execution time once ParforProgress ends.
+%   show_execution_time = 1;
 %   try % Initialization
-%       ppm = ParforProgressStarter2('test', N, percentage_update, do_debug, run_javaaddpath);
+%       ppm = ParforProgressStarter2('test', N, percentage_update, do_debug, run_javaaddpath, show_execution_time);
 %   catch me % make sure "ParforProgressStarter2" didn't get moved to a different directory
 %       if strcmp(me.message, 'Undefined function or method ''ParforProgressStarter2'' for input arguments of type ''char''.')
 %           error('ParforProgressStarter2 not in path.');
@@ -51,7 +53,7 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
     %%
 
     if nargin < 2
-        disp('usage: ppm = ParforProgressStarter2( text, number_runs, update_percentage, do_debug, run_javaaddpath )');
+        disp('usage: ppm = ParforProgressStarter2( text, number_runs, update_percentage, do_debug, run_javaaddpath, show_execution_time )');
         ppm = [];
         return;
     end
@@ -66,6 +68,10 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
     
     if nargin < 5
         run_javaaddpath = 1;
+    end
+    
+    if nargin < 6
+        show_execution_time = 1;
     end
 
     %% determine whether java and awt are available
@@ -126,10 +132,10 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
     switch version_to_use
         case 1
             use_gui = 1;
-            ppm = ParforProgress2(s, n, percentage, do_debug, use_gui);
+            ppm = ParforProgress2(s, n, percentage, do_debug, use_gui, show_execution_time);
         case 2
             use_gui = 0;            
-            ppm = ParforProgress2(s, n, percentage, do_debug, use_gui);
+            ppm = ParforProgress2(s, n, percentage, do_debug, use_gui, show_execution_time);
         case 3
             % no java, no awt, or old matlab version
             disp('Progress will update in arbitrary order.');

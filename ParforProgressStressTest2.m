@@ -1,4 +1,4 @@
-function ParforProgressStressTest2(N, run_javaaddpath)
+function ParforProgressStressTest2(N, run_javaaddpath, show_execution_time)
 % Stress test for 'ParforProgressStarter2'. In case of timeouts, you can
 % use this function to determine how many simultaneous connections your
 % computer can handle, and adjust the ppm.increment() call accordingly.
@@ -6,6 +6,11 @@ function ParforProgressStressTest2(N, run_javaaddpath)
 % Copyright (c) 2010-2014, Andreas Kotowicz
 %
 %%
+
+    if nargin < 3
+        % by default we show the execution time once ParforProgress ends.
+        show_execution_time = 1;
+    end
 
     if nargin < 2
         % by default we always run 'javaaddpath'. Set this to 0 if you are 
@@ -25,7 +30,7 @@ function ParforProgressStressTest2(N, run_javaaddpath)
     % show debugging information.
     do_debug = 1;
     try % Initialization
-        ppm = ParforProgressStarter2('test task - ParforProgressStarter2', N, percentage_update, do_debug, run_javaaddpath);
+        ppm = ParforProgressStarter2('test task - ParforProgressStarter2', N, percentage_update, do_debug, run_javaaddpath, show_execution_time);
     catch me % make sure "ParforProgressStarter2" didn't get moved to a different directory
         if strcmp(me.message, 'Undefined function or method ''ParforProgressStarter2'' for input arguments of type ''char''.')
             error('ParforProgressStarter2 not in path.');
