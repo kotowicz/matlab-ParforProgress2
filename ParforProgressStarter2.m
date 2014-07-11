@@ -36,6 +36,16 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
 %       end
 %   end
 %
+%
+%   !! PARFOR behaviour has changed !!
+%
+%   With Matlab >= 2014a, "parfor" will automatically startup the
+%   parallel pool, even if you don't want it:
+%   "Starting parallel pool (parpool) using the 'local' profile"
+%
+%   With Matlab < 2014a, "parfor" will be ignored and would fallback to 
+%   a simple "for", if parallel pool wasn't manually started.
+%
 %   parfor i = 1 : N
 %       your_crazy_function();
 %       ppm.increment(i);

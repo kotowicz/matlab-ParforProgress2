@@ -48,6 +48,15 @@ function ParforProgressStressTest2(N, run_javaaddpath, show_execution_time)
     
     t0 = tic();
     
+    % !! PARFOR behaviour has changed !!
+    %
+    % With Matlab >= 2014a, "parfor" will automatically startup the
+    % parallel pool, even if you don't want it:
+    % "Starting parallel pool (parpool) using the 'local' profile"
+    %
+    % With Matlab < 2014a, "parfor" will be ignored and would fallback to 
+    % a simple "for", if parallel pool wasn't manually started.
+    % 
     parfor i = 1 : N
         rand(1, 10000);
         ppm.increment(i); %#ok<PFBNS>
