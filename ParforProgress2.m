@@ -12,18 +12,22 @@
 % end of each iteration. This sends a notification back to the server which 
 % then updates the GUI.
 %
+%
 % Example:
+%{
+
+    N = 10000;
+    ppm = ParforProgress2('my task', N);
+    parfor i = 1 : N
+        rand(1);
+        ppm.increment(i);
+    end
+    delete(ppm);
+
+%}
 %
-% N = 100;
-% ppm = ParforProgress2('my task', N);
-% parfor i = 1 : N
-%     rand(1);
-%     ppm.increment(i);
-% end
-% delete(ppm);
 %
-%
-% Copyright (c) 2010-2014, Andreas Kotowicz
+% Copyright (c) 2010-2023, Andreas Kotowicz
 
 classdef ParforProgress2 < handle
 
@@ -85,6 +89,9 @@ classdef ParforProgress2 < handle
 
                 o.JavaBit   = ParforProgressServer2.createServer(s, n, percentage, use_gui, show_execution_time);
                 o.Port      = double(o.JavaBit.getPort());
+                
+                % get the version number
+                % o.JavaBit.getVersion()
                 
                 % Get the client host name from pctconfig - needs
                 % distcomp toolbox.

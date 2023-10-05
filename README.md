@@ -40,29 +40,36 @@ $ cd .matlab/R2013a
 $ echo "/path/to/matlab-ParforProgress2" > javaclasspath.txt
 ```
 
-Next, startup Matlab and call `ParforProgressStarter2`, but do not run `javaddpath`:
+On macOS this translates to:
+```
+$ cd ~/Library/Application\ Support/MathWorks/MATLAB/R2020a/  
+$ echo "/Users/username/Documents/GitHub/matlab-ParforProgress2" > javaclasspath.txt
+```
+
+
+Next, startup Matlab (or restart Matlab if it was running) and call `ParforProgressStarter2`, but do not run `javaddpath`:
 
 
 ```
- >> % setup parameters
- >> show_execution_time = 1;
- >> run_javaaddpath = 0;
- >> s = 'dummy task';
- >> n = 100;
- >> percentage = 0.1;
- >> do_debug = 0;
- >>
- >> % initialize the ProgressMonitor
- >> ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath, show_execution_time)
- >> 
- >> % run your computation
- >> for j = 1 : n
- >>     your_computation();
- >>     ppm.increment(i); 
- >> end
- >>
- >> % delete the ProgressMonitor
- >> delete(ppm);
+ % setup parameters
+ show_execution_time = 1;
+ run_javaaddpath = 0;
+ s = 'dummy task';
+ n = 100;
+ percentage = 0.1;
+ do_debug = 0;
+ 
+ % initialize the ProgressMonitor
+ ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpath, show_execution_time)
+ 
+ % run your computation
+ for j = 1 : n
+     your_computation();
+     ppm.increment(j); 
+ end
+ 
+ % delete the ProgressMonitor
+ delete(ppm);
 ```
 
 
@@ -81,4 +88,11 @@ edit this file. Here's how you can locate it:
 
 
 
+## D) Recompile 
 
+On macOS
+
+```
+javac -source 1.8 -target 1.8 -cp .: ParforProgressServer2.java
+javac -source 1.8 -target 1.8 -cp .: ParforProgressClient2.java
+```
