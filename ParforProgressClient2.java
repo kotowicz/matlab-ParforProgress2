@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014, Andreas Kotowicz
+ * Copyright (c) 2010-2023, Andreas Kotowicz
  *
  *
  * ideas for this code are from:

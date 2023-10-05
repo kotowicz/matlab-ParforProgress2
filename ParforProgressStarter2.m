@@ -58,7 +58,7 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
 %
 %%%%%%%%%%%%%% End ParforProgressStarter2 suggested usage %%%%%%%%%%%%%%%%%
 % 
-% Copyright (c) 2010-2014, Andreas Kotowicz
+% Copyright (c) 2010-2023, Andreas Kotowicz
 %
     %%
 
@@ -126,16 +126,21 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
     a = which(mfilename);
     dir_to_add = fileparts(a);
     
+    pathDelimiter = pathsep; % Gets the path delimiter based on OS
     if pool_slaves > 0
-        if java_enabled == 1 && run_javaaddpath == 1
+        if java_enabled == 1 && run_javaaddpath == 1 && ~isInJavaPath(dir_to_add)
             pctRunOnAll(['javaaddpath({''' dir_to_add '''})']);
         end
-        pctRunOnAll(['addpath(''' dir_to_add ''')']);
+        if ~isInMatlabPath(dir_to_add, pathDelimiter)
+            pctRunOnAll(['addpath(''' dir_to_add ''')']);
+        end
     else
-        if java_enabled == 1 && run_javaaddpath == 1
+        if java_enabled == 1 && run_javaaddpath == 1 && ~isInJavaPath(dir_to_add)
             javaaddpath({dir_to_add});
         end
-        addpath(dir_to_add);
+        if ~isInMatlabPath(dir_to_add, pathDelimiter)
+            addpath(dir_to_add);
+        end
     end
     
     %%
@@ -156,4 +161,20 @@ function ppm = ParforProgressStarter2(s, n, percentage, do_debug, run_javaaddpat
     end
     
 end
+
+
+%% Helper functions
+function isPresent = isInJavaPath(dir_to_check)
+    currentStaticJavaPath = javaclasspath('-static');
+    currentDynamicJavaPath = javaclasspath('-dynamic');
+    combinedJavaPath = [currentStaticJavaPath; currentDynamicJavaPath];
+    isPresent = any(strcmp(dir_to_check, combinedJavaPath));
+end
+
+function isPresent = isInMatlabPath(dir_to_check, pathDelimiter)
+    currentPath = strsplit(path, pathDelimiter);
+    isPresent = any(strcmp(dir_to_check, currentPath));
+end
+
 %% EOF
+
