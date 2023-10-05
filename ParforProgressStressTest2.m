@@ -3,7 +3,7 @@ function ParforProgressStressTest2(N, run_javaaddpath, show_execution_time)
 % use this function to determine how many simultaneous connections your
 % computer can handle, and adjust the ppm.increment() call accordingly.
 %
-% Copyright (c) 2010-2014, Andreas Kotowicz
+% Copyright (c) 2010-2023, Andreas Kotowicz
 %
 %%
 
@@ -20,7 +20,7 @@ function ParforProgressStressTest2(N, run_javaaddpath, show_execution_time)
 
     if nargin < 1
         % how many iterations of the for loop do we run?
-        N = 10000;
+        N = 5000;
     end
     
     %% initialize ParforProgress monitor

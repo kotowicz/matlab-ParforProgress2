@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010-2014, Andreas Kotowicz
+ * Copyright (c) 2010-2023, Andreas Kotowicz
  *
  *
  * ideas for this code are from:
@@ -41,12 +41,12 @@ import javax.swing.Timer;
 
 import java.awt.GridLayout;
 import java.awt.event.*;
-
 import java.io.Console;
-
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ParforProgressServer2 implements Runnable, ActionListener {
+
+	private static final String VERSION = "1.23.1";
 
 	private JFrame fFrame;
 	private JLabel fLabel;
@@ -141,6 +141,11 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
 
     }
 
+    // Getter method for version
+    public static String getVersion() {
+        return VERSION;
+    }    
+
     private double goal;
     private double PERCENTAGE = 0.05;
     private double fraction_all;
@@ -150,7 +155,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
     private double ETA_time = 0;
     
     // when did the monitor start / stop?
-    private static double time_start;
+    private double time_start;
     private static double time_stop; 
     
 	private ServerSocketChannel serverSocket;
@@ -172,7 +177,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
         return (double) tmp / factor;
     }    
     
-    public static String CurrentRuntime(int precision) {
+    public String CurrentRuntime(int precision) {
         String runtime;
         time_stop = System.currentTimeMillis();
         
@@ -258,6 +263,7 @@ public class ParforProgressServer2 implements Runnable, ActionListener {
                 }
             });
             
+            // change width & height of progress bar here, then recompile
             fFrame.setSize(300, 75);
             fFrame.setVisible(true);
             fFrame.setResizable(true);
